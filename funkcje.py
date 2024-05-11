@@ -18,7 +18,7 @@ kolumny: dict = {
     ,'PR2':'float64'
 }
 
-df = pd.read_excel(r'D:\STUDIA\UCZENIE MASZYNOWE\PROJEKT\dane_calosc.xlsx', sheet_name='DANE')
+df = pd.read_excel(r'D:\plik.xlsx', sheet_name='DANE')
 df = df.astype(kolumny).set_index('INDEKS')
 
 druzyny_elo: dict = {}
