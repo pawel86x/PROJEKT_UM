@@ -46,13 +46,33 @@ class Elo:
 
     @staticmethod
     def wynik(gole_a: int, gole_b: int, typ: int=1) -> float:
-        if typ == 1:
-            return 1 if gole_a > gole_b else 0.5 if gole_a == gole_b else 0
+        return 1 if gole_a > gole_b else 0.5 if gole_a == gole_b else 0
+
+    @staticmethod
+    def punkty(gole_a: int, gole_b: int, pkt_wygrana: int=3) -> int:
+        return pkt_wygrana if gole_a > gole_b else 1 if gole_a == gole_b else 0
 
     def oczekiwany_wynik(self, elo_a: float, elo_b: float, dom_a: bool=True, dom_b: bool=False) -> float:
-        elo_a =+ self.__przewaga_a if dom_a else elo_a
-        elo_b =+ self.__przewaga_a if dom_b else elo_b
+        elo_a = elo_a + self.__przewaga_a if dom_a else elo_a
+        elo_b = elo_b + self.__przewaga_a if dom_b else elo_b
         return 1 / (1 + 10 ** ((elo_b - elo_a) / self.__wsp_400))
+
+    def oczekiwany_wynik_multi(self, elo_przeciwnikow: list[float], wlasny: float) -> float:
+        return sum([self.oczekiwany_wynik(wlasny, przeciwnik) for przeciwnik in elo_przeciwnikow])
+
+    def ranking_turniejowy(self, elo_przeciwnikow: list[float], punkty: float) -> float:
+        if punkty == 0:
+            punkty = 0.05
+        elif punkty == len(elo_przeciwnikow):
+            punkty -= 0.05
+        lo, hi = 0, 4000
+        while hi - lo > 0.001:
+            rank = (lo + hi) / 2
+            if self.oczekiwany_wynik_multi(elo_przeciwnikow, rank) < punkty:
+                lo = rank
+            else:
+                hi = rank
+        return round(rank)
 
     def nowe_rankingi(
             self, elo_a: float, elo_b: float, gole_a: int, gole_b: int,
